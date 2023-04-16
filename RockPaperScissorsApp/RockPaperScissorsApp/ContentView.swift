@@ -11,7 +11,7 @@ struct ContentView: View {
     @State private var isPlaying = false
     
     var body: some View {
-//        Result(title: "Tie!", color: [Color(red: 255/255, green: 204/255, blue: 0/255), Color(red: 255/255, green: 92/255, blue: 0/255)])
+        //        Result(title: "Tie!", color: [Color(red: 255/255, green: 204/255, blue: 0/255), Color(red: 255/255, green: 92/255, blue: 0/255)])
         NavigationView {
             VStack {
                 WelcomePage(isPlaying: $isPlaying)
@@ -50,14 +50,16 @@ struct WelcomePage: View {
 struct takeYourPickSingle: View {
     var playerPick = "Your pick"
     var takeYourPick = "Take your pick"
-    var thinking = "Your opponent is thinking"
+    var thinking = "Your\n opponent is\n thinking"
     @State private var header = "Take your pick"
     @State private var changed = false
     @State private var selectedPaper = false
     @State private var selectedScissors = false
     @State private var selectedRock = false
     @State private var selected = false
-
+    @State private var next = false
+    @State private var showScore = true
+    
     var body: some View {
         ZStack {
             VStack(spacing: 74) {
@@ -67,10 +69,11 @@ struct takeYourPickSingle: View {
                         .font(.system(size: 54))
                         .multilineTextAlignment(.center)
                         .fontWeight(.bold)
-
                     
-                    Text("Score 0:0")
-                        .foregroundColor(Color(red: 103/255, green: 80/255, blue: 164/255))
+                    if showScore {
+                        Text("Score 0:0")
+                            .foregroundColor(Color(red: 103/255, green: 80/255, blue: 164/255))
+                    }
                 }
                 
                 VStack(spacing: 24) {
@@ -79,27 +82,33 @@ struct takeYourPickSingle: View {
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     if !selected || selectedScissors {
-                        choiceButton(isSelected: $selectedScissors, selected: $selected, image: "scissors")
+                        choiceButton(isSelected: $selectedScissors, selected: $selected, image: next ? "loading" : "scissors")
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     if !selected || selectedRock {
                         choiceButton(isSelected: $selectedRock, selected: $selected, image: "rock")
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
+                    
+                    if next {
+                        loadingImage
+                    }
                 }
                 .frame(height: 432)
                 
             }
-            .padding(.vertical, 120)
-//            .frame(height: UIScreen.main.bounds.height)
+            //            .padding(.vertical, 120)
+            .frame(height: UIScreen.main.bounds.height)
             .navigationTitle("Round #1")
             
             VStack {
                 Spacer()
-                            if selected {
-                changeButton(changed: $changed)
-                                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                            }
+                if selected && !next {
+                    changeOrNext(changeView: $changed, text: "I changed my mind")
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    changeOrNext(changeView: $next, text: "Next")
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
                 
             }
             .padding(.bottom, 60)
@@ -114,13 +123,23 @@ struct takeYourPickSingle: View {
                     selectedScissors = false
                     selectedRock = false
                     selected = false
+                    next = false
+                    showScore = true
                     header = takeYourPick
-                    
-                        
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        header = thinking
-                    }
-                        
+                }
+            }
+        }
+        
+        .onChange(of: next) { newValue in
+            if next {
+                withAnimation {
+                    changed = false
+                    selectedPaper = false
+                    selectedScissors = false
+                    selectedRock = false
+                    selected = true
+                    showScore = false
+                    header = thinking
                 }
             }
         }
@@ -132,6 +151,16 @@ struct takeYourPickSingle: View {
                 }
             }
         }
+    }
+    
+    var loadingImage: some View {
+            RoundedRectangle(cornerRadius: 48)
+            .fill(Color(red: 243/255, green: 242/255, blue: 248/255))
+            .frame(width: 348, height: 128)
+            .overlay {
+                Image("loading")
+                    .frame(width: 40, height: 40)
+            }
     }
 }
 
@@ -152,11 +181,11 @@ struct YourPick: View {
             Spacer(minLength: 226)
             
             VStack {
-//                choiceButton(image: "scissors")
+                //                choiceButton(image: "scissors")
             }
             
             Spacer()
-//            numberOfPlayers(players: "I changed my mind")
+            //            numberOfPlayers(players: "I changed my mind")
         }
         .padding(.top, 120)
         .padding(.bottom, 40)
@@ -174,9 +203,9 @@ struct opponentPick: View {
                     .multilineTextAlignment(.center)
                     .fontWeight(.bold)
                 
-//                choiceButton(isSelected: false, image: "scissors")
+                //                choiceButton(isSelected: false, image: "scissors")
             }
-
+            
             Spacer()
         }
         .padding(.top, 120)
@@ -275,15 +304,16 @@ struct numberOfPlayers: View {
     }
 }
 
-struct changeButton: View {
-    @Binding var changed: Bool
+struct changeOrNext: View {
+    @Binding var changeView: Bool
+    var text: String
     var body: some View {
         Button(action: {
             withAnimation(.spring()) {
-                changed = true
+                changeView = true
             }
         }) {
-            Text("I changed my mind")
+            Text(text)
                 .fontWeight(.semibold)
                 .frame(width: 295, height: 22)
                 .foregroundColor(.white)
