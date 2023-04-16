@@ -30,9 +30,26 @@ enum statusGame {
 class Player: canPlayInRSPGame {
     
     var choice: elements
-    var score = 0
+    var score = 0 {
+        didSet {
+            if score < 0 {
+                score = 0
+            }
+        }
+    }
     var name: String
-    var status: statusGame
+    var status: statusGame {
+        didSet {
+            switch status {
+            case .win:
+                score += 1
+            case .lose:
+                break
+            case .tie:
+                break
+            }
+        }
+    }
     
     init(name: String, choice: elements) {
         self.name = name
@@ -47,8 +64,7 @@ class Player: canPlayInRSPGame {
 //        print("\(self.name) chose \(first.rawValue), \(player2.name) chose \(second.rawValue)")
         
         if first.rawValue == second.rawValue {
-            status = .tie
-//            print("There's no a winner")
+            print("There's no a winner")
         }
         else { // win
             if (self.choice == .rock && player2.choice == .scissors
@@ -56,13 +72,15 @@ class Player: canPlayInRSPGame {
                 || self.choice == .paper && player2.choice == .rock) {
                 
                 status = .win
-//                print("\(first.rawValue) beats \(second.rawValue)")
-//                print("\(self.name) wins")
+                player2.status = .lose
+                print("\(first.rawValue) beats \(second.rawValue)")
+                print("\(self.name) wins")
             }
             else { // lose
-//                print("\(second.rawValue) beats \(first.rawValue)")
-//                print("\(player2.name) wins")
+                print("\(second.rawValue) beats \(first.rawValue)")
+                print("\(player2.name) wins")
                 status = .lose
+                player2.status = .win
             }
         }
     }
