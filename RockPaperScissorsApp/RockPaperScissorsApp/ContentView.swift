@@ -51,6 +51,7 @@ struct takeYourPickSingle: View {
     var playerPick = "Your pick"
     var takeYourPick = "Take your pick"
     var thinking = "Your\n opponent is\n thinking"
+    var oponentPick = "Your opponent’s pick"
     @State private var header = "Take your pick"
     @State private var changed = false
     @State private var selectedPaper = false
@@ -59,6 +60,7 @@ struct takeYourPickSingle: View {
     @State private var selected = false
     @State private var next = false
     @State private var showScore = true
+    @State private var loadOrPick = "loading"
     
     var body: some View {
         ZStack {
@@ -82,7 +84,7 @@ struct takeYourPickSingle: View {
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     if !selected || selectedScissors {
-                        choiceButton(isSelected: $selectedScissors, selected: $selected, image: next ? "loading" : "scissors")
+                        choiceButton(isSelected: $selectedScissors, selected: $selected, image: "scissors")
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     if !selected || selectedRock {
@@ -91,7 +93,18 @@ struct takeYourPickSingle: View {
                     }
                     
                     if next {
-                        loadingImage
+                        loadOrPickImage(imageName: $loadOrPick)
+                            .onAppear {
+                                if loadOrPick == "loading" {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                        withAnimation {
+                                            header = oponentPick
+                                            loadOrPick = "paper"
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.bottom, 55)
                     }
                 }
                 .frame(height: 432)
@@ -109,7 +122,6 @@ struct takeYourPickSingle: View {
                     changeOrNext(changeView: $next, text: "Next")
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
-                
             }
             .padding(.bottom, 60)
         }
@@ -153,12 +165,19 @@ struct takeYourPickSingle: View {
         }
     }
     
-    var loadingImage: some View {
-            RoundedRectangle(cornerRadius: 48)
+    var result: some View {
+        Text("hello world")
+    }
+}
+
+struct loadOrPickImage: View {
+    @Binding var imageName: String
+    var body: some View {
+        RoundedRectangle(cornerRadius: 48)
             .fill(Color(red: 243/255, green: 242/255, blue: 248/255))
             .frame(width: 348, height: 128)
             .overlay {
-                Image("loading")
+                Image(imageName)
                     .frame(width: 40, height: 40)
             }
     }
@@ -203,7 +222,7 @@ struct opponentPick: View {
                     .multilineTextAlignment(.center)
                     .fontWeight(.bold)
                 
-                //                choiceButton(isSelected: false, image: "scissors")
+//                                choiceButton(isSelected: false, image: "scissors")
             }
             
             Spacer()
