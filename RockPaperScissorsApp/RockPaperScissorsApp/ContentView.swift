@@ -52,6 +52,7 @@ struct takeYourPickSingle: View {
     var takeYourPick = "Take your pick"
     var thinking = "Your\n opponent is\n thinking"
     var oponentPick = "Your opponent’s pick"
+    @State private var buttonWidth = 348
     @State private var header = "Take your pick"
     @State private var changed = false
     @State private var selectedPaper = false
@@ -93,18 +94,35 @@ struct takeYourPickSingle: View {
                     }
                     
                     if next {
-                        loadOrPickImage(imageName: $loadOrPick)
-                            .onAppear {
-                                if loadOrPick == "loading" {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        withAnimation {
-                                            header = oponentPick
-                                            loadOrPick = "paper"
+                        ZStack {
+                            loadOrPickImage(imageName: $loadOrPick)
+                                .onAppear {
+                                    if loadOrPick == "loading" {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                            withAnimation {
+                                                header = oponentPick
+                                                loadOrPick = "paper"
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            .padding(.bottom, 55)
+//                                .offset(x: -50)
+                                .padding(.bottom, 55)
+                            
+                            loadOrPickImage(imageName: $loadOrPick)
+                                .onAppear {
+                                    if loadOrPick == "loading" {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                            withAnimation {
+                                                header = oponentPick
+                                                loadOrPick = "paper"
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding(.bottom, 55)
+//                                .offset(x: -70, y: -70)
+                        }
                     }
                 }
                 .frame(height: 432)
@@ -172,14 +190,27 @@ struct takeYourPickSingle: View {
 
 struct loadOrPickImage: View {
     @Binding var imageName: String
+    @State var Width: CGFloat = 348
+    @State var offsetX: CGFloat = 0
+    @State var offsetY: CGFloat = 0
+    var smallWidth = 198
     var body: some View {
         RoundedRectangle(cornerRadius: 48)
             .fill(Color(red: 243/255, green: 242/255, blue: 248/255))
-            .frame(width: 348, height: 128)
+            .frame(width: Width, height: 128)
             .overlay {
                 Image(imageName)
                     .frame(width: 40, height: 40)
             }
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                    Width = 198
+                    offsetX = -80
+                    offsetY = -80
+                }
+            }
+            .offset(x: offsetX, y: offsetY)
+            .animation(.spring())
     }
 }
 
