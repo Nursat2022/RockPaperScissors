@@ -30,13 +30,7 @@ enum statusGame {
 class Player: canPlayInRSPGame {
     
     var choice: elements
-    var score = 0 {
-        didSet {
-            if score < 0 {
-                score = 0
-            }
-        }
-    }
+    var score = 0
     var name: String
     var status: statusGame {
         didSet {
@@ -64,6 +58,8 @@ class Player: canPlayInRSPGame {
 //        print("\(self.name) chose \(first.rawValue), \(player2.name) chose \(second.rawValue)")
         
         if first.rawValue == second.rawValue {
+            player2.status = .tie
+            status = .tie
             print("There's no a winner")
         }
         else { // win

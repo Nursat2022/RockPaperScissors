@@ -42,8 +42,12 @@ struct WelcomePage: View {
                 
                 Spacer()
                 
-                numberOfPlayers(isPlaying: $isPlayingSingle, players: "Single player")
-                numberOfPlayers(isPlaying: $isPlayingMultiple, players: "Multi player")
+                BottomButton(text: "Single player") {
+                    isPlayingSingle = true
+                }
+                BottomButton(text: "Multi player") {
+                    isPlayingMultiple = true
+                }
             }
             .padding(.top, 120)
             .padding(.bottom, 40)
@@ -83,10 +87,10 @@ struct SinglePlayer: View {
         offsetY2 = 0
         color = [.black]
         anotherRound = false
-        playerChoice = ""
-        oponentChoice = ""
-        player.status = .tie
-        oponent.status = .tie
+//        playerChoice = ""
+//        oponentChoice = ""
+//        player.status = .tie
+//        oponent.status = .tie
     }
     
     var playerPick = "Your pick"
@@ -133,15 +137,15 @@ struct SinglePlayer: View {
                 
                 VStack(spacing: 24) {
                     if !selected || selectedPaper {
-                        choiceButton(isSelected: $selectedPaper, selected: $selected, choice: $playerChoice, oponentChoice: $oponentChoice, image: "paper")
+                        choiceButtonSingle(isSelected: $selectedPaper, selected: $selected, choice: $playerChoice, oponentChoice: $oponentChoice, image: "paper")
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     if !selected || selectedScissors {
-                        choiceButton(isSelected: $selectedScissors, selected: $selected, choice: $playerChoice, oponentChoice: $oponentChoice, image: "scissors")
+                        choiceButtonSingle(isSelected: $selectedScissors, selected: $selected, choice: $playerChoice, oponentChoice: $oponentChoice, image: "scissors")
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     if !selected || selectedRock {
-                        choiceButton(isSelected: $selectedRock, selected: $selected, choice: $playerChoice, oponentChoice: $oponentChoice, image: "rock")
+                        choiceButtonSingle(isSelected: $selectedRock, selected: $selected, choice: $playerChoice, oponentChoice: $oponentChoice, image: "rock")
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     
@@ -149,7 +153,6 @@ struct SinglePlayer: View {
                         ZStack {
                             loadOrPickImage(imageName: $loadOrPick, offsetX: $offsetX1, offsetY: $offsetY1)
                                 .onAppear {
-                                    if loadOrPick == "loading" {
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                             withAnimation {
                                                 header = oponentPick
@@ -167,10 +170,10 @@ struct SinglePlayer: View {
                                         
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
                                             withAnimation(.spring()) {
-                                                header = result
+//                                                header = result
                                                 showScore = true
                                                 anotherRound = true
-                                                color = loseColor
+//                                                color = loseColor
                                                 switch player.status {
                                                 case .win:
                                                     header = "Win!"
@@ -178,41 +181,31 @@ struct SinglePlayer: View {
                                                 case .lose:
                                                     header = "Lose"
                                                     color = loseColor
-                                                case.tie:
+                                                case .tie:
                                                     header = "Tie!"
                                                     color = tieColor
                                                 }
                                             }
                                         }
-                                    }
                                 }
                                 .padding(.bottom, 55)
                             
                             loadOrPickImage(imageName: $playerChoice, offsetX: $offsetX2, offsetY: $offsetY2)
                                 .onAppear {
-                                    if loadOrPick == "loading" {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                            withAnimation {
-                                                header = oponentPick
-                                                loadOrPick = player.choice.rawValue
-                                            }
-                                        }
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                                            withAnimation(.spring()) {
-                                                offsetY2 = -10
-                                                offsetX2 = 70
-                                            }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                        withAnimation(.spring()) {
+                                            offsetY2 = -10
+                                            offsetX2 = 70
                                         }
                                     }
                                 }
                                 .padding(.bottom, 55)
-                            
+//
                             if anotherRound {
                                 withAnimation {
                                     VStack {
                                         Spacer()
-//                                        changeOrNext(changeView: $changed, text: "Another round")
-                                        anotherButton(text: "Another round", action: defaultSettings)
+                                        BottomButton(text: "Another round", action: defaultSettings)
                                     }
                                     .padding(.top, 500)
                                 }
@@ -223,24 +216,27 @@ struct SinglePlayer: View {
                 .frame(height: 432)
                 
             }
-            //            .padding(.vertical, 120)
             .frame(height: UIScreen.main.bounds.height)
             .navigationTitle("Round #1")
             
             VStack {
                 Spacer()
                 if selected && !next {
-                    changeOrNext(changeView: $changed, text: "I changed my mind")
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    changeOrNext(changeView: $next, text: "Next")
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    BottomButton(text: "I changed my mind", action: {
+                        changed = true
+                    })
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    BottomButton(text: "Next", action: {
+                        next = true
+                    })
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
             .padding(.bottom, 60)
         }
         .padding(.vertical, 120)
         
-        .onChange(of: oponentChoice, perform: { newValue in
+        .onChange(of: oponentChoice, perform: { _ in
             switch oponentChoice {
             case "paper": oponent.choice = .paper
             case "rock": oponent.choice = .rock
@@ -250,7 +246,7 @@ struct SinglePlayer: View {
             }
         })
         
-        .onChange(of: playerChoice, perform: { newValue in
+        .onChange(of: playerChoice, perform: { _ in
             switch playerChoice {
             case "paper": player.choice = .paper
             case "rock": player.choice = .rock
@@ -260,7 +256,7 @@ struct SinglePlayer: View {
             }
         })
         
-        .onChange(of: changed) { newValue in
+        .onChange(of: changed) { _ in
             if changed {
                 withAnimation {
                     changed = false
@@ -275,7 +271,7 @@ struct SinglePlayer: View {
             }
         }
         
-        .onChange(of: next) { newValue in
+        .onChange(of: next) { _ in
             if next {
                 withAnimation {
                     changed = false
@@ -286,11 +282,11 @@ struct SinglePlayer: View {
                     showScore = false
                     header = thinking
                 }
-                
+                player.play(player2: oponent)
             }
         }
         
-        .onChange(of: selected) { newValue in
+        .onChange(of: selected) { _ in
             withAnimation {
                 if selected {
                     header = playerPick
@@ -299,7 +295,6 @@ struct SinglePlayer: View {
         }
     }
 }
-
 
 struct MultiplePlayer: View {
     func defaultSettings() {
@@ -324,12 +319,15 @@ struct MultiplePlayer: View {
         player2Choice = ""
         player1.status = .tie
         player2.status = .tie
+        currentPlayer = "Player1"
+        start = true
     }
     
     var playerPick = "Your pick"
     var takeYourPick = "Take your pick"
     var thinking = "Your\n opponent is\n thinking"
     var oponentPick = "Your opponent’s pick"
+    @State private var start = true
     @State private var header = "Take your pick"
     @State private var loadOrPick = "loading"
     @State private var result = "Tie!"
@@ -365,22 +363,22 @@ struct MultiplePlayer: View {
                     headerText(color: $color, text: $header)
                     
                     if showScore {
-                        Text("\(player1.name) · Score \(player1.score):\(player2.score)")
+                        Text("\(currentPlayer) · Score \(player1.score):\(player2.score)")
                             .foregroundColor(Color(red: 103/255, green: 80/255, blue: 164/255))
                     }
                 }
                 
                 VStack(spacing: 24) {
                     if !selected || selectedPaper {
-                        choiceButton(isSelected: $selectedPaper, selected: $selected, choice: $player1Choice, oponentChoice: $player2Choice, image: "paper")
+                        choiceButtonMultiple(isSelected: $selectedPaper, selected: $selected, choice: currentPlayer == "Player1" ? $player1Choice : $player2Choice, image: "paper")
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     if !selected || selectedScissors {
-                        choiceButton(isSelected: $selectedScissors, selected: $selected, choice: $player1Choice, oponentChoice: $player2Choice, image: "scissors")
+                        choiceButtonMultiple(isSelected: $selectedScissors, selected: $selected, choice: currentPlayer == "Player1" ? $player1Choice : $player2Choice, image: "scissors")
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     if !selected || selectedRock {
-                        choiceButton(isSelected: $selectedRock, selected: $selected, choice: $player1Choice, oponentChoice: $player2Choice, image: "rock")
+                        choiceButtonMultiple(isSelected: $selectedRock, selected: $selected, choice: currentPlayer == "Player1" ? $player1Choice : $player2Choice, image: "rock")
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     
@@ -388,17 +386,19 @@ struct MultiplePlayer: View {
                         if currentPlayer == "Player1" {
                             VStack {
                                 Spacer()
-                                changeOrNext(changeView: $changed, text: "ready")
+                                BottomButton(text: "ready to continue") {
+                                    currentPlayer = "Player2"
+                                }
                             }
                         }
-                        else {
+                        else if currentPlayer == "Player2" && player2Choice != "" {
                             ZStack {
                                 loadOrPickImage(imageName: $loadOrPick, offsetX: $offsetX1, offsetY: $offsetY1)
                                     .onAppear {
                                         if loadOrPick == "loading" {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                                 withAnimation {
-                                                    header = oponentPick
+
                                                     loadOrPick = player2.choice.rawValue
                                                 }
                                             }
@@ -417,7 +417,7 @@ struct MultiplePlayer: View {
                                                     showScore = true
                                                     anotherRound = true
                                                     color = loseColor
-                                                    switch player1.status {
+                                                    switch player2.status {
                                                     case .win:
                                                         header = "Win!"
                                                         color = winColor
@@ -439,7 +439,6 @@ struct MultiplePlayer: View {
                                         if loadOrPick == "loading" {
                                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                                 withAnimation {
-                                                    header = oponentPick
                                                     loadOrPick = player1.choice.rawValue
                                                 }
                                             }
@@ -457,8 +456,7 @@ struct MultiplePlayer: View {
                                     withAnimation {
                                         VStack {
                                             Spacer()
-                                            //                                        changeOrNext(changeView: $changed, text: "Another round")
-                                            anotherButton(text: "Another round", action: defaultSettings)
+                                            BottomButton(text: "Another round", action: defaultSettings)
                                         }
                                         .padding(.top, 500)
                                     }
@@ -470,26 +468,35 @@ struct MultiplePlayer: View {
                 .frame(height: 432)
                 
             }
-            .onChange(of: currentPlayer, perform: { newValue in
-                if currentPlayer == "Player1" {
-                    header = "Pass the phone to your ozxpponent"
-                }
-            })
             .frame(height: UIScreen.main.bounds.height)
             .navigationTitle("Round #1")
             
             VStack {
                 Spacer()
                 if selected && !next {
-                    changeOrNext(changeView: $changed, text: "I changed my mind")
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    changeOrNext(changeView: $next, text: "Next")
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    
+                    BottomButton(text: "I changed my mind", action: {
+                        changed = true
+                    })
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    BottomButton(text: "Next", action: {
+                        next = true
+                    })
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
             .padding(.bottom, 60)
         }
         .padding(.vertical, 120)
+        
+        .onChange(of: currentPlayer, perform: { newValue in
+            if currentPlayer == "Player1" && next {
+                header = "Pass the phone to your opponent"
+            }
+            else {
+                changed = true
+            }
+        })
         
         .onChange(of: player2Choice, perform: { newValue in
             switch player2Choice {
@@ -537,7 +544,9 @@ struct MultiplePlayer: View {
                     showScore = false
                     header = thinking
                 }
-                
+                if currentPlayer == "Player2" {
+                    player2.play(player2: player1)
+                }
             }
         }
         
@@ -557,7 +566,6 @@ struct loadOrPickImage: View {
     @State var Width: CGFloat = 348
     @Binding var offsetX: CGFloat
     @Binding var offsetY: CGFloat
-    var smallWidth = 198
     var body: some View {
         RoundedRectangle(cornerRadius: 48)
             .fill(Color(red: 243/255, green: 242/255, blue: 248/255))
@@ -565,7 +573,7 @@ struct loadOrPickImage: View {
             .overlay {
                 Image(imageName)
                     .frame(width: 40, height: 40)
-                    RoundedRectangle(cornerRadius: 48)
+                RoundedRectangle(cornerRadius: 48)
                     .stroke(Color.white, lineWidth: 10)
             }
             .onAppear {
@@ -575,27 +583,6 @@ struct loadOrPickImage: View {
             }
             .offset(x: offsetX, y: offsetY)
             .animation(.spring())
-    }
-}
-
-struct anotherButton: View {
-    var text: String
-    var action: () -> ()
-    var body: some View {
-        Button(action: {
-            withAnimation(.spring()) {
-                action()
-            }
-        }) {
-            Text(text)
-                .fontWeight(.semibold)
-                .frame(width: 295, height: 22)
-                .foregroundColor(.white)
-        }
-        .padding(.horizontal, 31.5)
-        .padding(.vertical, 14)
-        .background(Color(red: 103/255, green: 80/255, blue: 164/255))
-        .cornerRadius(8)
     }
 }
 
@@ -611,7 +598,7 @@ extension View {
     }
 }
 
-struct choiceButton: View {
+struct choiceButtonSingle: View {
     @Binding var isSelected: Bool
     @Binding var selected: Bool
     @Binding var choice: String
@@ -635,43 +622,25 @@ struct choiceButton: View {
     }
 }
 
-struct numberOfPlayers: View {
-    @Binding var isPlaying: Bool
-    var players: String
-    var body: some View {
-        Button(action: {
-            isPlaying = true
-        }) {
-            Text(players)
-                .fontWeight(.semibold)
-                .frame(width: 295, height: 22)
-                .foregroundColor(.white)
-        }
-        .padding(.horizontal, 31.5)
-        .padding(.vertical, 14)
-        .background(Color(red: 103/255, green: 80/255, blue: 164/255))
-        .cornerRadius(8)
-    }
-}
-
-struct changeOrNext: View {
-    @Binding var changeView: Bool
-    var text: String
+struct choiceButtonMultiple: View {
+    @Binding var isSelected: Bool
+    @Binding var selected: Bool
+    @Binding var choice: String
+    var image: String
     var body: some View {
         Button(action: {
             withAnimation(.spring()) {
-                changeView = true
+                isSelected = true
+                selected = true
+                choice = image
             }
         }) {
-            Text(text)
-                .fontWeight(.semibold)
-                .frame(width: 295, height: 22)
-                .foregroundColor(.white)
+            Image(image)
+                .frame(width: 294, height: 80)
         }
-        .padding(.horizontal, 31.5)
-        .padding(.vertical, 14)
-        .background(Color(red: 103/255, green: 80/255, blue: 164/255))
-        .cornerRadius(8)
+        .padding(24)
+        .background(Color(red: 243/255, green: 242/255, blue: 248/255))
+        .cornerRadius(47)
     }
 }
 
@@ -681,81 +650,7 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-struct Result: View {
-    var title: String
-    var color: [Color]
-    var body: some View {
-        VStack {
-            VStack(spacing: 12) {
-                Text(title)
-                    .gradientForeground(colors: color)
-                    .font(.system(size: 54))
-                    .multilineTextAlignment(.center)
-                    .fontWeight(.bold)
-                
-                Text("Score 0:0")
-                    .foregroundColor(Color(red: 103/255, green: 80/255, blue: 164/255))
-                
-                HStack {
-                    RoundedRectangle(cornerRadius: 48)
-                        .frame(width: 198, height: 128)
-                        .foregroundColor(Color(red: 243/255, green: 242/255, blue: 248/255))
-                    
-                        .overlay {
-                            Image("scissors")
-                                .frame(width: 80, height: 80)
-                        }
-                    
-                    RoundedRectangle(cornerRadius: 48)
-                        .frame(width: 190, height: 128)
-                        .foregroundColor(Color(red: 243/255, green: 242/255, blue: 248/255))
-                    
-                        .overlay {
-                            Image("rock")
-                                .frame(width: 80, height: 80)
-                        }
-                        .offset(x: -60)
-                }
-            }
-        }
-    }
-}
-
-
-struct opponentPick: View {
-    var body: some View {
-        VStack {
-            VStack(spacing: 136) {
-                Text("Your opponent’s pick")
-                    .foregroundColor(.black)
-                    .font(.system(size: 54))
-                    .multilineTextAlignment(.center)
-                    .fontWeight(.bold)
-                
-//                                choiceButton(isSelected: false, image: "scissors")
-            }
-            
-            Spacer()
-        }
-        .padding(.top, 120)
-        .ignoresSafeArea()
-    }
-}
-
-
 struct BottomButton: View {
-    @Binding var changeView: Bool
     var text: String
     var action: () -> ()
     var body: some View {
@@ -777,31 +672,4 @@ struct BottomButton: View {
 }
 
 
-struct YourPick: View {
-    var body: some View {
-        VStack {
-            VStack(spacing: 12) {
-                Text("Your pick")
-                    .foregroundColor(.black)
-                    .font(.system(size: 54))
-                    .multilineTextAlignment(.center)
-                    .fontWeight(.bold)
-                
-                Text("Score 0:0")
-                    .foregroundColor(Color(red: 103/255, green: 80/255, blue: 164/255))
-            }
-            
-            Spacer(minLength: 226)
-            
-            VStack {
-                //                choiceButton(image: "scissors")
-            }
-            
-            Spacer()
-            //            numberOfPlayers(players: "I changed my mind")
-        }
-        .padding(.top, 120)
-        .padding(.bottom, 40)
-        .ignoresSafeArea()
-    }
-}
+
