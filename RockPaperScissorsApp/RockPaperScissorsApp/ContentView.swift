@@ -70,21 +70,21 @@ struct headerText: View {
 struct SinglePlayer: View {
     
     func defaultSettings() {
-        header = "Take your pick"
-        loadOrPick = "loading"
+//        header = "Take your pick"
+//        loadOrPick = "loading"
         changed = false
         selectedPaper = false
         selectedScissors = false
         selectedRock = false
         selected = false
         next = false
-        showScore = true
+//        showScore = true
         offsetX1 = 0
         offsetY1 = 0
-        offsetX2 = UIScreen.main.bounds.width
-        offsetY2 = 0
-        color = [.black]
-        anotherRound = false
+//        offsetX2 = UIScreen.main.bounds.width
+//        offsetY2 = 0
+//        color = [.black]
+//        anotherRound = false
     }
     
     var playerPick = "Your pick"
@@ -259,6 +259,7 @@ struct SinglePlayer: View {
                     showScore = true
                     header = takeYourPick
                 }
+                print("changed")
             }
         }
         
@@ -272,9 +273,12 @@ struct SinglePlayer: View {
                     selected = true
                     showScore = false
                     header = thinking
+                    print("next true")
+
                 }
                 player.play(player2: oponent)
             }
+            print("next false")
         }
         
         .onChange(of: selected) { _ in
@@ -283,6 +287,7 @@ struct SinglePlayer: View {
                     header = playerPick
                 }
             }
+            print("selected")
         }
     }
 }
