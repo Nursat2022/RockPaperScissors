@@ -72,7 +72,6 @@ struct SinglePlayer: View {
     func defaultSettings() {
         header = "Take your pick"
         loadOrPick = "loading"
-        result = "Tie!"
         changed = false
         selectedPaper = false
         selectedScissors = false
@@ -80,17 +79,12 @@ struct SinglePlayer: View {
         selected = false
         next = false
         showScore = true
-        buttonWidth = 348
         offsetX1 = 0
         offsetY1 = 0
         offsetX2 = UIScreen.main.bounds.width
         offsetY2 = 0
         color = [.black]
         anotherRound = false
-//        playerChoice = ""
-//        oponentChoice = ""
-//        player.status = .tie
-//        oponent.status = .tie
     }
     
     var playerPick = "Your pick"
@@ -99,7 +93,6 @@ struct SinglePlayer: View {
     var oponentPick = "Your opponent’s pick"
     @State private var header = "Take your pick"
     @State private var loadOrPick = "loading"
-    @State private var result = "Tie!"
     @State private var changed = false
     @State private var selectedPaper = false
     @State private var selectedScissors = false
@@ -107,7 +100,6 @@ struct SinglePlayer: View {
     @State private var selected = false
     @State private var next = false
     @State private var showScore = true
-    @State private var buttonWidth = 348
     @State private var offsetX1: CGFloat = 0
     @State private var offsetY1: CGFloat = 0
     @State private var offsetX2: CGFloat = UIScreen.main.bounds.width
@@ -153,40 +145,38 @@ struct SinglePlayer: View {
                         ZStack {
                             loadOrPickImage(seconds: 4, imageName: $loadOrPick, offsetX: $offsetX1, offsetY: $offsetY1)
                                 .onAppear {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                            withAnimation {
-                                                header = oponentPick
-                                                loadOrPick = oponent.choice.rawValue
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                        withAnimation {
+                                            header = oponentPick
+                                            loadOrPick = oponent.choice.rawValue
+                                        }
+                                    }
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                                        withAnimation(.spring()) {
+                                            header = ""
+                                            offsetY1 = -80
+                                            offsetX1 = -70
+                                        }
+                                    }
+                                    
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                                        withAnimation(.spring()) {
+                                            showScore = true
+                                            anotherRound = true
+                                            switch player.status {
+                                            case .win:
+                                                header = "Win!"
+                                                color = winColor
+                                            case .lose:
+                                                header = "Lose"
+                                                color = loseColor
+                                            case .tie:
+                                                header = "Tie!"
+                                                color = tieColor
                                             }
                                         }
-                                        
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                                            withAnimation(.spring()) {
-                                                header = ""
-                                                offsetY1 = -80
-                                                offsetX1 = -70
-                                            }
-                                        }
-                                        
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-                                            withAnimation(.spring()) {
-//                                                header = result
-                                                showScore = true
-                                                anotherRound = true
-//                                                color = loseColor
-                                                switch player.status {
-                                                case .win:
-                                                    header = "Win!"
-                                                    color = winColor
-                                                case .lose:
-                                                    header = "Lose"
-                                                    color = loseColor
-                                                case .tie:
-                                                    header = "Tie!"
-                                                    color = tieColor
-                                                }
-                                            }
-                                        }
+                                    }
                                 }
                                 .padding(.bottom, 55)
                             
@@ -200,7 +190,7 @@ struct SinglePlayer: View {
                                     }
                                 }
                                 .padding(.bottom, 55)
-//
+                            
                             if anotherRound {
                                 withAnimation {
                                     VStack {
@@ -226,6 +216,7 @@ struct SinglePlayer: View {
                         changed = true
                     })
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                    
                     BottomButton(text: "Next", action: {
                         next = true
                     })
@@ -300,7 +291,6 @@ struct MultiplePlayer: View {
     func defaultSettings() {
         header = "Take your pick"
         loadOrPick = "loading"
-        result = "Tie!"
         changed = false
         selectedPaper = false
         selectedScissors = false
@@ -308,7 +298,6 @@ struct MultiplePlayer: View {
         selected = false
         next = false
         showScore = true
-        buttonWidth = 348
         offsetX1 = 0
         offsetY1 = 0
         offsetX2 = UIScreen.main.bounds.width
@@ -353,7 +342,6 @@ struct MultiplePlayer: View {
     
     var player1 = Player(name: "Player1", choice: .paper)
     var player2 = Player(name: "Player2", choice: .rock)
-    
     @State var currentPlayer = "Player1"
     
     var body: some View {
@@ -396,55 +384,40 @@ struct MultiplePlayer: View {
                             ZStack {
                                 loadOrPickImage(seconds: 2, imageName: $player2Choice, offsetX: $offsetX1, offsetY: $offsetY1)
                                     .onAppear {
-//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                                                withAnimation {
-////                                                    pla = player2.choice.rawValue
-//                                                }
-//                                            }
-                                            
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                                withAnimation(.spring()) {
-                                                    header = ""
-                                                    offsetY1 = -80
-                                                    offsetX1 = -70
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                            withAnimation(.spring()) {
+                                                header = ""
+                                                offsetY1 = -80
+                                                offsetX1 = -70
+                                            }
+                                        }
+                                        
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                                            withAnimation(.spring()) {
+                                                showScore = true
+                                                anotherRound = true
+                                                switch player2.status {
+                                                case .win:
+                                                    header = "Win!"
+                                                    color = winColor
+                                                case .lose:
+                                                    header = "Lose"
+                                                    color = loseColor
+                                                case .tie:
+                                                    header = "Tie!"
+                                                    color = tieColor
                                                 }
                                             }
-                                            
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                                                withAnimation(.spring()) {
-//                                                    header = result
-                                                    showScore = true
-                                                    anotherRound = true
-//                                                    color = loseColor
-                                                    switch player2.status {
-                                                    case .win:
-                                                        header = "Win!"
-                                                        color = winColor
-                                                    case .lose:
-                                                        header = "Lose"
-                                                        color = loseColor
-                                                    case .tie:
-                                                        header = "Tie!"
-                                                        color = tieColor
-                                                    }
-                                                }
-                                            }
+                                        }
                                     }
                                     .padding(.bottom, 55)
                                 
                                 loadOrPickImage(seconds: 2, imageName: $player1Choice, offsetX: $offsetX2, offsetY: $offsetY2)
                                     .onAppear {
-                                        if loadOrPick == "loading" {
-//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//                                                withAnimation {
-//                                                    loadOrPick = player1.choice.rawValue
-//                                                }
-//                                            }
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                                                withAnimation(.spring()) {
-                                                    offsetY2 = -10
-                                                    offsetX2 = 70
-                                                }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                            withAnimation(.spring()) {
+                                                offsetY2 = -10
+                                                offsetX2 = 70
                                             }
                                         }
                                     }
@@ -476,6 +449,7 @@ struct MultiplePlayer: View {
                         changed = true
                     })
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+                    
                     BottomButton(text: "Next", action: {
                         next = true
                     })
@@ -486,7 +460,7 @@ struct MultiplePlayer: View {
         }
         .padding(.vertical, 120)
         
-        .onChange(of: currentPlayer, perform: { newValue in
+        .onChange(of: currentPlayer, perform: { _ in
             if currentPlayer == "Player1" && next {
                 header = "Pass the phone to your opponent"
             }
@@ -495,7 +469,7 @@ struct MultiplePlayer: View {
             }
         })
         
-        .onChange(of: player2Choice, perform: { newValue in
+        .onChange(of: player2Choice, perform: { _ in
             switch player2Choice {
             case "paper": player2.choice = .paper
             case "rock": player2.choice = .rock
@@ -505,7 +479,7 @@ struct MultiplePlayer: View {
             }
         })
         
-        .onChange(of: player1Choice, perform: { newValue in
+        .onChange(of: player1Choice, perform: { _ in
             switch player1Choice {
             case "paper": player1.choice = .paper
             case "rock": player1.choice = .rock
@@ -515,7 +489,7 @@ struct MultiplePlayer: View {
             }
         })
         
-        .onChange(of: changed) { newValue in
+        .onChange(of: changed) { _ in
             if changed {
                 withAnimation {
                     changed = false
@@ -530,7 +504,7 @@ struct MultiplePlayer: View {
             }
         }
         
-        .onChange(of: next) { newValue in
+        .onChange(of: next) { _ in
             if next {
                 withAnimation {
                     changed = false
@@ -543,13 +517,13 @@ struct MultiplePlayer: View {
                 if currentPlayer == "Player2" {
                     player2.play(player2: player1)
                 }
-                if currentPlayer == "Player1" {
+                else {
                     header = "Pass the phone to your opponent"
                 }
             }
         }
         
-        .onChange(of: selected) { newValue in
+        .onChange(of: selected) { _ in
             withAnimation {
                 if selected {
                     header = playerPick
