@@ -151,7 +151,7 @@ struct SinglePlayer: View {
                     
                     if next {
                         ZStack {
-                            loadOrPickImage(imageName: $loadOrPick, offsetX: $offsetX1, offsetY: $offsetY1)
+                            loadOrPickImage(seconds: 4, imageName: $loadOrPick, offsetX: $offsetX1, offsetY: $offsetY1)
                                 .onAppear {
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                             withAnimation {
@@ -190,7 +190,7 @@ struct SinglePlayer: View {
                                 }
                                 .padding(.bottom, 55)
                             
-                            loadOrPickImage(imageName: $playerChoice, offsetX: $offsetX2, offsetY: $offsetY2)
+                            loadOrPickImage(seconds: 4, imageName: $playerChoice, offsetX: $offsetX2, offsetY: $offsetY2)
                                 .onAppear {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                                         withAnimation(.spring()) {
@@ -390,20 +390,19 @@ struct MultiplePlayer: View {
                                     currentPlayer = "Player2"
                                 }
                             }
+                            .padding(.top, 390)
                         }
                         else if currentPlayer == "Player2" && player2Choice != "" {
                             ZStack {
-                                loadOrPickImage(imageName: $loadOrPick, offsetX: $offsetX1, offsetY: $offsetY1)
+                                loadOrPickImage(seconds: 2, imageName: $player2Choice, offsetX: $offsetX1, offsetY: $offsetY1)
                                     .onAppear {
-                                        if loadOrPick == "loading" {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                                withAnimation {
-
-                                                    loadOrPick = player2.choice.rawValue
-                                                }
-                                            }
+//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                                                withAnimation {
+////                                                    pla = player2.choice.rawValue
+//                                                }
+//                                            }
                                             
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                                 withAnimation(.spring()) {
                                                     header = ""
                                                     offsetY1 = -80
@@ -411,12 +410,12 @@ struct MultiplePlayer: View {
                                                 }
                                             }
                                             
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                                                 withAnimation(.spring()) {
-                                                    header = result
+//                                                    header = result
                                                     showScore = true
                                                     anotherRound = true
-                                                    color = loseColor
+//                                                    color = loseColor
                                                     switch player2.status {
                                                     case .win:
                                                         header = "Win!"
@@ -424,25 +423,24 @@ struct MultiplePlayer: View {
                                                     case .lose:
                                                         header = "Lose"
                                                         color = loseColor
-                                                    case.tie:
+                                                    case .tie:
                                                         header = "Tie!"
                                                         color = tieColor
                                                     }
                                                 }
                                             }
-                                        }
                                     }
                                     .padding(.bottom, 55)
                                 
-                                loadOrPickImage(imageName: $player1Choice, offsetX: $offsetX2, offsetY: $offsetY2)
+                                loadOrPickImage(seconds: 2, imageName: $player1Choice, offsetX: $offsetX2, offsetY: $offsetY2)
                                     .onAppear {
                                         if loadOrPick == "loading" {
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                                withAnimation {
-                                                    loadOrPick = player1.choice.rawValue
-                                                }
-                                            }
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//                                                withAnimation {
+//                                                    loadOrPick = player1.choice.rawValue
+//                                                }
+//                                            }
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                                                 withAnimation(.spring()) {
                                                     offsetY2 = -10
                                                     offsetX2 = 70
@@ -474,7 +472,6 @@ struct MultiplePlayer: View {
             VStack {
                 Spacer()
                 if selected && !next {
-                    
                     BottomButton(text: "I changed my mind", action: {
                         changed = true
                     })
@@ -542,10 +539,12 @@ struct MultiplePlayer: View {
                     selectedRock = false
                     selected = true
                     showScore = false
-                    header = thinking
                 }
                 if currentPlayer == "Player2" {
                     player2.play(player2: player1)
+                }
+                if currentPlayer == "Player1" {
+                    header = "Pass the phone to your opponent"
                 }
             }
         }
@@ -562,6 +561,7 @@ struct MultiplePlayer: View {
 
 
 struct loadOrPickImage: View {
+    var seconds: Int
     @Binding var imageName: String
     @State var Width: CGFloat = 348
     @Binding var offsetX: CGFloat
@@ -577,7 +577,7 @@ struct loadOrPickImage: View {
                     .stroke(Color.white, lineWidth: 10)
             }
             .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + DispatchTimeInterval.seconds(seconds)) {
                     Width = 198
                 }
             }
